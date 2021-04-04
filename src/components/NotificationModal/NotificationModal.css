@@ -1,0 +1,15 @@
+.notification-modal__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.notification-modal__icon {
+  margin: 0 0 16px 0;
+}
+
+.notification-modal__message {
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 17px;
+}

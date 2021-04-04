@@ -1,0 +1,42 @@
+.modal {
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 1s, opacity 0.5s ease-in;
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal_opened {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal__container {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  padding: 36px;
+  background-color: #fff;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+.modal__icon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+@media screen and (max-width: 450px) {
+  .modal__container {
+    max-width: 300px;
+    padding: 20px;
+  }
+}

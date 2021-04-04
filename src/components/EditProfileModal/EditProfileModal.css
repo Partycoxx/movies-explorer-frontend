@@ -1,0 +1,21 @@
+.edit-data-modal__form {
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.edit-data-modal__input-container {
+  height: 135px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 0 40px 0;
+}
+
+.edit-data-modal__button {
+  width: 100%;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  padding: 13px 0 15px;
+  margin: 0 0 16px 0;
+}
