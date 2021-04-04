@@ -21,7 +21,7 @@ export default function Navigation({ type, isMobile }) {
       isChecked: false,
     },
     {
-      location: "/favorites",
+      location: "/saved-movies",
       isChecked: false,
     },
     {
@@ -90,7 +90,7 @@ export default function Navigation({ type, isMobile }) {
         Фильмы
       </Link>
       <Link
-        to="/favorites"
+        to="/saved-movies"
         className={classNames(
           "navigation__link",
           "navigation__link_application",
