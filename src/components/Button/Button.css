@@ -14,3 +14,7 @@
 .button_transparent {
   background-color: transparent;
 }
+
+.button:disabled {
+  background-color: #cecece;
+}

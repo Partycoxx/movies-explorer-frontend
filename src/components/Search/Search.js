@@ -1,19 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "../Button/Button";
 import Slider from "../Slider/Slider";
 import "./Search.css";
 
-export default function Search() {
+export default function Search({ onFormSubmit }) {
+  const [searchData, setSearchData] = useState({
+    movie: "",
+    hasShortFilms: false,
+  });
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    onFormSubmit(searchData);
+  };
+
+  const handleSLiderChange = (e) => {
+    setSearchData((searchData) => ({
+      ...searchData,
+      hasShortFilms: e.target.checked,
+    }));
+  };
+
+  const handleInputChange = (e) => {
+    setSearchData((searchData) => ({
+      ...searchData,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const isInputEmpty = () => (searchData.movie.length === 0 ? true : false);
+
   return (
-    <div className="search">
-      <input className="search__input" placeholder="Фильм" />
+    <form className="search" onSubmit={handleFormSubmit}>
+      <input
+        className="search__input"
+        placeholder="Фильм"
+        name="movie"
+        value={searchData.movie}
+        onChange={handleInputChange}
+        required={true}
+      />
       <Button
         className="search__button"
-        onClick={() => {}}
+        onClick={handleFormSubmit}
         text="Найти"
         type="primary"
+        disabled={isInputEmpty()}
       />
-      <Slider />
-    </div>
+      <Slider
+        value={searchData.hasShortFilms}
+        clickHandler={handleSLiderChange}
+      />
+    </form>
   );
 }

@@ -6,12 +6,12 @@ import Footer from "../../components/Footer/Footer";
 import MoviesList from "../../components/MoviesList/MoviesList";
 import { movies } from "../../utils/mockMoviesData";
 
-export default function Movies() {
+export default function Movies({ onFormSubmit }) {
   return (
     <>
       <Header type="application" hasNavigation={true} />
       <ContentBlock type="movies">
-        <Search />
+        <Search onFormSubmit={onFormSubmit} />
         <MoviesList type={"movies"} movies={movies} />
       </ContentBlock>
       <Footer />

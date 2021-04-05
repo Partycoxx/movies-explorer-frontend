@@ -62,12 +62,22 @@ function App() {
     });
   };
 
+  const onSearchFormSubmit = (data) => {
+    console.log("Submitted:", data);
+  };
+
   return (
     <Layout>
       <Switch>
         <Route exact path="/signin" component={Login} />
         <Route exact path="/signup" component={Register} />
-        <Route exact path="/movies" component={Movies} />
+        <Route
+          exact
+          path="/movies"
+          render={(props) => (
+            <Movies {...props} onFormSubmit={onSearchFormSubmit} />
+          )}
+        />
         <Route exact path="/saved-movies" component={SavedMovies} />
         <Route
           exact
