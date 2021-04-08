@@ -34,6 +34,7 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [savedMovies, setSavedMovies] = useState([]);
   const [shouldShowPreloader, setShouldShowPreloader] = useState(false);
+  const [storedMovies, setStoredMovies] = useState([]);
 
   const history = useHistory();
 
@@ -49,7 +50,6 @@ function App() {
             email: userData.email,
           }));
           setSavedMovies(() => savedMovies);
-          console.log("savedMovies", savedMovies);
         })
         .catch((err) => console.log(new Error(err)));
     } else {
@@ -60,7 +60,8 @@ function App() {
           .then(() => {
             setIsLoggedIn(() => true);
 
-            history.goBack();
+            console.log("path", history.location.pathname);
+            history.push("/");
           })
           .catch((err) => console.log(new Error(err)));
       }
@@ -100,6 +101,10 @@ function App() {
     setMovies(() => []);
   };
 
+  const resetStoredMovies = () => {
+    setStoredMovies(() => []);
+  };
+
   const submitUserData = (userData) => {
     closeModals();
     mainApiRequest
@@ -125,7 +130,6 @@ function App() {
     setIsLoggedIn(false);
     setCurrentUser(() => ({}));
     resetMovies();
-    localStorage.removeItem("movies");
     history.push("/");
     openNotificationModal({
       type: "success",
@@ -134,21 +138,18 @@ function App() {
   };
 
   const onSearchFormSubmit = (data, statusCallback) => {
-    console.log("Submitted:", data);
     setShouldShowPreloader(() => true);
     localStorage.removeItem("movies");
     resetMovies();
     moviesApiRequest
       .getMovies()
       .then((res) => {
-        console.log(res);
         const preparedMoviesList = prepareMoviesList(res, data);
 
         if (preparedMoviesList.length === 0) {
           statusCallback(() => "Ничего не найдено");
         } else {
           setMovies(() => preparedMoviesList);
-          console.log(preparedMoviesList);
           localStorage.setItem("movies", JSON.stringify(preparedMoviesList));
         }
       })
@@ -165,12 +166,13 @@ function App() {
   };
 
   const onSearchSavedMoviesSubmit = (data, statusCallback) => {
-    console.log("Submitted:", data);
-    setShouldShowPreloader(() => true);
-
+    setStoredMovies(() => []);
     const searchResult = filterMoviesList(savedMovies, data);
 
     if (searchResult.length > 0) {
+      setStoredMovies(() => searchResult);
+    } else {
+      statusCallback(() => "Ничего не найдено");
     }
   };
 
@@ -217,12 +219,9 @@ function App() {
   };
 
   const onSaveMovie = (movieData) => {
-    console.log("Posted:", movieData);
-
     mainApiRequest
       .saveMovie(movieData)
       .then((res) => {
-        console.log(res);
         openNotificationModal({
           type: "success",
           message: `Фильм «${res.nameRU}» успешно добавлен в избранное!`,
@@ -239,12 +238,9 @@ function App() {
   };
 
   const onDeleteMovie = (id) => {
-    console.log("Posted", id);
-
     mainApiRequest
       .deleteMovie(id)
       .then((res) => {
-        console.log(res);
         const newSavedMovies = savedMovies.filter(
           (item) => item.movieId !== res.movieId
         );
@@ -294,6 +290,8 @@ function App() {
                 savedMovies={savedMovies}
                 handleDeleteMovie={onDeleteMovie}
                 handleSearchSavedMovies={onSearchSavedMoviesSubmit}
+                storedMovies={storedMovies}
+                cleanUp={resetStoredMovies}
               />
             </ProtectedRoute>
 

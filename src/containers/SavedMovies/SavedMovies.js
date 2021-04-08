@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../../components/Header/Header";
 import ContentBlock from "../../components/ContentBlock/ContentBlock";
 import Search from "../../components/Search/Search";
@@ -11,8 +11,26 @@ export default function SavedMovies({
   savedMovies,
   handleDeleteMovie,
   handleSearchSavedMovies,
+  storedMovies,
+  cleanUp,
 }) {
   const [moviesListStatus, setMoviesListStatus] = useState("");
+  const [moviesList, setMoviesList] = useState([]);
+
+  useEffect(() => {
+    if (storedMovies.length > 0) {
+      setMoviesList(() => storedMovies);
+    } else {
+      setMoviesList(() => savedMovies);
+    }
+  }, [savedMovies, storedMovies]);
+
+  useEffect(() => {
+    return () => {
+      cleanUp();
+    };
+  }, []);
+
   return (
     <>
       <Header type="application" hasNavigation={true} isLoggedIn={isLoggedIn} />
@@ -24,7 +42,7 @@ export default function SavedMovies({
           />
           <MoviesList
             type={"saved-movies"}
-            movies={savedMovies}
+            movies={moviesList}
             handleDeleteMovie={handleDeleteMovie}
             moviesListStatus={moviesListStatus}
           />
