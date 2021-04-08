@@ -15,9 +15,6 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
   });
 
   const user = useContext(CurrentUserContext);
-
-  console.log(user);
-
   useEffect(() => {
     setUserData((userData) => ({ ...userData, ...user }));
   }, [user]);
@@ -43,15 +40,12 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
     handleSubmit(userData);
   };
 
-  console.log("userData", userData);
-
   const hasErrors = () => Object.values(errors).some((item) => item.length > 0);
 
   const hasData = () =>
     Object.values(userData).every((item) => item.length > 0);
 
   const isFormValid = () => !hasErrors() && hasData();
-  console.log(isFormValid());
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
