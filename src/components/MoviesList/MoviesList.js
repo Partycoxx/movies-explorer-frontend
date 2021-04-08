@@ -16,7 +16,7 @@ export default function MoviesList({
           <Movie
             type={type}
             item={item}
-            key={index}
+            key={item.movieId}
             onSaveMovie={handleSaveMovie}
             onDeleteMovie={handleDeleteMovie}
           />

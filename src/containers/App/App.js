@@ -6,7 +6,7 @@ import { SavedMoviesContext } from "../../contexts/SavedMoviesContext";
 
 import { mainApiRequest } from "../../utils/MainApi";
 import { moviesApiRequest } from "../../utils/MoviesApi";
-import { prepareMoviesList } from "../../utils/helpers";
+import { filterMoviesList, prepareMoviesList } from "../../utils/helpers";
 
 import Layout from "../../components/Layout/Layout";
 import Main from "../Main/Main";
@@ -59,7 +59,8 @@ function App() {
           .getCurrentUserData()
           .then(() => {
             setIsLoggedIn(() => true);
-            history.push("/movies");
+
+            history.goBack();
           })
           .catch((err) => console.log(new Error(err)));
       }
@@ -163,6 +164,16 @@ function App() {
       });
   };
 
+  const onSearchSavedMoviesSubmit = (data, statusCallback) => {
+    console.log("Submitted:", data);
+    setShouldShowPreloader(() => true);
+
+    const searchResult = filterMoviesList(savedMovies, data);
+
+    if (searchResult.length > 0) {
+    }
+  };
+
   const onSignIn = ({ email, password }) => {
     mainApiRequest
       .loginUser({ email, password })
@@ -188,16 +199,12 @@ function App() {
   };
 
   const onSignUp = (authData) => {
+    const { password } = authData;
     mainApiRequest
       .registerUser(authData)
       .then((res) => {
-        console.log(res);
-        setCurrentUser((prev) => ({ ...prev, res }));
-        openNotificationModal({
-          type: "success",
-          message: "Вы успешно зарегистрировались",
-        });
-        history.push("/signin");
+        setCurrentUser(() => ({ ...res }));
+        onSignIn({ ...res, password });
       })
       .catch((err) => {
         setCurrentUser(() => ({}));
@@ -286,6 +293,7 @@ function App() {
                 isLoggedIn={isLoggedIn}
                 savedMovies={savedMovies}
                 handleDeleteMovie={onDeleteMovie}
+                handleSearchSavedMovies={onSearchSavedMoviesSubmit}
               />
             </ProtectedRoute>
 

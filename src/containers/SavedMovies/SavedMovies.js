@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../components/Header/Header";
 import ContentBlock from "../../components/ContentBlock/ContentBlock";
 import Search from "../../components/Search/Search";
@@ -10,17 +10,23 @@ export default function SavedMovies({
   isLoggedIn,
   savedMovies,
   handleDeleteMovie,
+  handleSearchSavedMovies,
 }) {
+  const [moviesListStatus, setMoviesListStatus] = useState("");
   return (
     <>
       <Header type="application" hasNavigation={true} isLoggedIn={isLoggedIn} />
       <ContentBlock type="movies">
         <div className="saved-movies">
-          <Search />
+          <Search
+            onFormSubmit={handleSearchSavedMovies}
+            setResultStatus={setMoviesListStatus}
+          />
           <MoviesList
             type={"saved-movies"}
             movies={savedMovies}
             handleDeleteMovie={handleDeleteMovie}
+            moviesListStatus={moviesListStatus}
           />
         </div>
       </ContentBlock>
