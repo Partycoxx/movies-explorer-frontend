@@ -1,15 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 import Button from "../../components/Button/Button";
 import Header from "../../components/Header/Header";
 
 import "./Profile.css";
 
-export default function Profile({
-  user,
-  handleOpenModal,
-  handleSignOut,
-  ...props
-}) {
+export default function Profile({ handleOpenModal, handleSignOut, ...props }) {
+  const user = useContext(CurrentUserContext);
   return (
     <>
       <Header type="application" hasNavigation={true} />

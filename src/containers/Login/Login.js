@@ -4,11 +4,11 @@ import Header from "../../components/Header/Header";
 
 import "./Login.css";
 
-export default function Login() {
+export default function Login({ handleSignIn }) {
   return (
     <>
       <Header type="authorization" hasNavigation={false} />
-      <Authorization type={"login"} />
+      <Authorization type={"login"} handleSignIn={handleSignIn} />
     </>
   );
 }

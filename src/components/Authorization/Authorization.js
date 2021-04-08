@@ -5,7 +5,7 @@ import Input from "../Input/Input";
 
 import "./Authorization.css";
 
-export default function Authorization({ type }) {
+export default function Authorization({ type, handleSignIn, handleSignUp }) {
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -23,22 +23,26 @@ export default function Authorization({ type }) {
       text: "Ещё не зарегистрированы?",
       linkText: "Регистрация",
       link: "/signup",
+      onClick: (data) => handleSignIn(data),
     },
     register: {
       button: "Зарегистрироваться",
       text: "Уже зарегистрированы?",
       linkText: "Войти",
       link: "/signin",
+      onClick: (data) => handleSignUp(data),
     },
   };
+
   const renderButtons = () => {
     return (
       <>
         <Button
-          onClick={() => {}}
+          onClick={() => buttonTexts[type].onClick(inputValues)}
           text={buttonTexts[type].button}
           className="authorization__button"
           type="primary"
+          disabled={!isFormValid()}
         />
         <span className="authorization__text">{buttonTexts[type].text}</span>
         <Link
@@ -65,6 +69,19 @@ export default function Authorization({ type }) {
     }
   };
 
+  const hasErrors = () => Object.values(errors).some((item) => item.length > 0);
+  const hasData = () => {
+    if (type === "login") {
+      return Object.entries(inputValues)
+        .filter((item) => item[0] !== "name")
+        .every((item) => item[1].length > 0);
+    } else {
+      return Object.values(inputValues).every((item) => item.length > 0);
+    }
+  };
+
+  const isFormValid = () => !hasErrors() && hasData();
+
   return (
     <section className="authorization">
       <div className="authorization__container">
@@ -88,8 +105,6 @@ export default function Authorization({ type }) {
             label="E-mail"
             id="email"
             type="email"
-            minLength="2"
-            maxLength="30"
             required={true}
             handleChange={handleInputChange}
             value={inputValues.email}
@@ -99,7 +114,7 @@ export default function Authorization({ type }) {
             label="Пароль"
             id="password"
             type="password"
-            minLength="2"
+            minLength="8"
             maxLength="30"
             required={true}
             handleChange={handleInputChange}

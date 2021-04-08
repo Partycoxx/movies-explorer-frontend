@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 import Input from "../Input/Input";
-import { user } from "../../utils/mockUserData";
 
 import "./EditProfileModal.css";
 import Button from "../Button/Button";
@@ -13,9 +13,11 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
     email: "",
   });
 
+  const user = useContext(CurrentUserContext);
+
   useEffect(() => {
     setUserData((userData) => ({ ...userData, ...user }));
-  }, []);
+  }, [user]);
 
   const handleInputChange = (e) => {
     const {
@@ -36,6 +38,12 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
     handleSubmit(userData);
   };
 
+  const hasErrors = () => Object.values(errors).some((item) => item.length > 0);
+  const hasData = () =>
+    Object.values(userData).every((item) => item.length > 0);
+
+  const isFormValid = () => !hasErrors() && hasData();
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="edit-data-modal">
@@ -55,11 +63,10 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
               value={userData.email}
               handleChange={handleInputChange}
               errors={errors}
-              minLength="2"
-              maxLength="30"
               required={true}
               id="email"
               label="E-mail"
+              type="email"
             />
           </div>
           <Button
@@ -67,6 +74,7 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
             text="Сохранить"
             className="edit-data-modal__button"
             type="primary"
+            disabled={!isFormValid()}
           />
         </form>
       </div>
