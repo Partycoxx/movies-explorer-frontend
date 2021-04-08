@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Route, Switch, useHistory } from "react-router-dom";
 import ProtectedRoute from "../../components/ProtectedRoute/ProtectedRoute";
 import { CurrentUserContext } from "../../contexts/CurrentUserContext";
+import { SavedMoviesContext } from "../../contexts/SavedMoviesContext";
 
 import { mainApiRequest } from "../../utils/MainApi";
 import { moviesApiRequest } from "../../utils/MoviesApi";
+import { prepareMoviesList } from "../../utils/helpers";
 
 import Layout from "../../components/Layout/Layout";
 import Main from "../Main/Main";
@@ -19,7 +21,6 @@ import NotificationModal from "../../components/NotificationModal/NotificationMo
 import EditProfileModal from "../../components/EditProfileModal/EditProfileModal";
 
 import "./App.css";
-import { filterMoviesList, prepareMoviesList } from "../../utils/helpers";
 
 function App() {
   const [notificationModal, setNotisicationModal] = useState({
@@ -31,18 +32,24 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
   const [movies, setMovies] = useState([]);
+  const [savedMovies, setSavedMovies] = useState([]);
   const [shouldShowPreloader, setShouldShowPreloader] = useState(false);
 
   const history = useHistory();
 
   useEffect(() => {
     if (isLoggedIn) {
-      Promise.all([mainApiRequest.getCurrentUserData()]) // Добавить получение данные с бэка Яндекса.
-        .then(([userData]) => {
+      Promise.all([
+        mainApiRequest.getCurrentUserData(),
+        mainApiRequest.getSavedMovies(),
+      ])
+        .then(([userData, savedMovies]) => {
           setCurrentUser(() => ({
             name: userData.name,
             email: userData.email,
           }));
+          setSavedMovies(() => savedMovies);
+          console.log("savedMovies", savedMovies);
         })
         .catch((err) => console.log(new Error(err)));
     } else {
@@ -88,6 +95,10 @@ function App() {
 
   //Управление работой с данными
 
+  const resetMovies = () => {
+    setMovies(() => []);
+  };
+
   const submitUserData = (userData) => {
     closeModals();
     mainApiRequest
@@ -112,6 +123,8 @@ function App() {
     window.localStorage.removeItem("token");
     setIsLoggedIn(false);
     setCurrentUser(() => ({}));
+    resetMovies();
+    localStorage.removeItem("movies");
     history.push("/");
     openNotificationModal({
       type: "success",
@@ -123,7 +136,7 @@ function App() {
     console.log("Submitted:", data);
     setShouldShowPreloader(() => true);
     localStorage.removeItem("movies");
-    setMovies(() => []);
+    resetMovies();
     moviesApiRequest
       .getMovies()
       .then((res) => {
@@ -159,7 +172,7 @@ function App() {
         setIsLoggedIn(true);
         openNotificationModal({
           type: "success",
-          message: "Вы успешно зарегистрировались",
+          message: "Вы успешно вошли в аккаунт",
         });
         setTimeout(() => {
           history.push("/movies");
@@ -196,52 +209,112 @@ function App() {
       });
   };
 
+  const onSaveMovie = (movieData) => {
+    console.log("Posted:", movieData);
+
+    mainApiRequest
+      .saveMovie(movieData)
+      .then((res) => {
+        console.log(res);
+        openNotificationModal({
+          type: "success",
+          message: `Фильм «${res.nameRU}» успешно добавлен в избранное!`,
+        });
+        setSavedMovies((savedMovies) => [...savedMovies, res]);
+      })
+      .catch((err) => {
+        console.log(new Error(err));
+        openNotificationModal({
+          type: "fail",
+          message: err,
+        });
+      });
+  };
+
+  const onDeleteMovie = (id) => {
+    console.log("Posted", id);
+
+    mainApiRequest
+      .deleteMovie(id)
+      .then((res) => {
+        console.log(res);
+        const newSavedMovies = savedMovies.filter(
+          (item) => item.movieId !== res.movieId
+        );
+        setSavedMovies(() => newSavedMovies);
+        openNotificationModal({
+          type: "success",
+          message: `Фильм «${res.nameRU}» успешно удалён из избранного!`,
+        });
+      })
+      .catch((err) => {
+        console.log(new Error(err));
+        openNotificationModal({
+          type: "fail",
+          message: err,
+        });
+      });
+  };
+
   return (
     <Layout>
       <CurrentUserContext.Provider value={currentUser}>
-        <Switch>
-          <Route exact path="/signin">
-            <Login handleSignIn={(data) => onSignIn(data)} />
-          </Route>
+        <SavedMoviesContext.Provider value={savedMovies}>
+          <Switch>
+            <Route exact path="/signin">
+              <Login handleSignIn={(data) => onSignIn(data)} />
+            </Route>
 
-          <Route exact path="/signup">
-            <Register handleSignUp={(data) => onSignUp(data)} />
-          </Route>
+            <Route exact path="/signup">
+              <Register handleSignUp={(data) => onSignUp(data)} />
+            </Route>
 
-          <ProtectedRoute exact path="/movies" isLoggedIn={isLoggedIn}>
-            <Movies
-              onFormSubmit={onSearchFormSubmit}
-              movies={movies}
-              shouldShowPreloader={shouldShowPreloader}
-            />
-          </ProtectedRoute>
+            <ProtectedRoute exact path="/movies" isLoggedIn={isLoggedIn}>
+              <Movies
+                onFormSubmit={onSearchFormSubmit}
+                movies={movies}
+                shouldShowPreloader={shouldShowPreloader}
+                isLoggedIn={isLoggedIn}
+                handleSaveMovie={onSaveMovie}
+                handleDeleteMovie={onDeleteMovie}
+                cleanUp={resetMovies}
+              />
+            </ProtectedRoute>
 
-          <ProtectedRoute exact path="/saved-movies" isLoggedIn={isLoggedIn}>
-            <SavedMovies />
-          </ProtectedRoute>
+            <ProtectedRoute exact path="/saved-movies" isLoggedIn={isLoggedIn}>
+              <SavedMovies
+                isLoggedIn={isLoggedIn}
+                savedMovies={savedMovies}
+                handleDeleteMovie={onDeleteMovie}
+              />
+            </ProtectedRoute>
 
-          <ProtectedRoute exact path="/profile" isLoggedIn={isLoggedIn}>
-            <Profile
-              handleOpenModal={() => openEditProfileModal()}
-              handleSignOut={onLogOut}
-            />
-          </ProtectedRoute>
+            <ProtectedRoute exact path="/profile" isLoggedIn={isLoggedIn}>
+              <Profile
+                handleOpenModal={() => openEditProfileModal()}
+                handleSignOut={onLogOut}
+                isLoggedIn={isLoggedIn}
+              />
+            </ProtectedRoute>
 
-          <Route exact path="/" component={Main} />
+            <Route exact path="/">
+              <Main isLoggedIn={isLoggedIn} />
+            </Route>
 
-          <Route path="*" component={ErrorPage} />
-        </Switch>
-        <NotificationModal
-          isOpen={notificationModal.isOpen}
-          type={notificationModal.type}
-          message={notificationModal.message}
-          onClose={closeModals}
-        />
-        <EditProfileModal
-          isOpen={editProfileModal.isOpen}
-          onClose={closeModals}
-          handleSubmit={(userData) => submitUserData(userData)}
-        />
+            <Route path="*" component={ErrorPage} />
+          </Switch>
+          <NotificationModal
+            isOpen={notificationModal.isOpen}
+            type={notificationModal.type}
+            message={notificationModal.message}
+            onClose={closeModals}
+          />
+          <EditProfileModal
+            isOpen={editProfileModal.isOpen}
+            onClose={closeModals}
+            handleSubmit={(userData) => submitUserData(userData)}
+          />
+        </SavedMoviesContext.Provider>
       </CurrentUserContext.Provider>
     </Layout>
   );

@@ -5,6 +5,7 @@ import Input from "../Input/Input";
 import "./EditProfileModal.css";
 import Button from "../Button/Button";
 import Modal from "../Modal/Modal";
+import { handleValidation } from "../../utils/helpers";
 
 export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
   const [userData, setUserData] = useState({ name: "", email: "" });
@@ -15,19 +16,23 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
 
   const user = useContext(CurrentUserContext);
 
+  console.log(user);
+
   useEffect(() => {
     setUserData((userData) => ({ ...userData, ...user }));
   }, [user]);
 
   const handleInputChange = (e) => {
     const {
-      target: { id, value, validationMessage },
+      target: { id, value },
     } = e;
 
     setUserData(() => ({ ...userData, [id]: value }));
 
-    if (!e.target.validity.valid) {
-      setErrors(() => ({ ...errors, [id]: validationMessage }));
+    const validationResult = handleValidation(e);
+
+    if (!validationResult.valid) {
+      setErrors(() => ({ ...errors, [id]: validationResult.message }));
     } else {
       setErrors(() => ({ ...errors, [id]: "" }));
     }
@@ -38,11 +43,15 @@ export default function EditDataModal({ isOpen, onClose, handleSubmit }) {
     handleSubmit(userData);
   };
 
+  console.log("userData", userData);
+
   const hasErrors = () => Object.values(errors).some((item) => item.length > 0);
+
   const hasData = () =>
     Object.values(userData).every((item) => item.length > 0);
 
   const isFormValid = () => !hasErrors() && hasData();
+  console.log(isFormValid());
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

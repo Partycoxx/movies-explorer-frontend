@@ -5,11 +5,15 @@ import Header from "../../components/Header/Header";
 
 import "./Profile.css";
 
-export default function Profile({ handleOpenModal, handleSignOut, ...props }) {
+export default function Profile({
+  handleOpenModal,
+  handleSignOut,
+  isLoggedIn,
+}) {
   const user = useContext(CurrentUserContext);
   return (
     <>
-      <Header type="application" hasNavigation={true} />
+      <Header type="application" hasNavigation={true} isLoggedIn={isLoggedIn} />
       <section className="profile">
         <div className="profile__container">
           <h1 className="profile__title">Привет, {user.name}</h1>

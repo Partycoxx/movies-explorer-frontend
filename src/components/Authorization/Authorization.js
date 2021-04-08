@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { handleValidation } from "../../utils/helpers";
 import Button from "../Button/Button";
 import Input from "../Input/Input";
 
@@ -57,13 +58,15 @@ export default function Authorization({ type, handleSignIn, handleSignUp }) {
 
   const handleInputChange = (e) => {
     const {
-      target: { id, value, validationMessage },
+      target: { id, value },
     } = e;
 
     setInputValues(() => ({ ...inputValues, [id]: value }));
 
-    if (!e.target.validity.valid) {
-      setErrors(() => ({ ...errors, [id]: validationMessage }));
+    const validationResult = handleValidation(e);
+
+    if (!validationResult.valid) {
+      setErrors(() => ({ ...errors, [id]: validationResult.message }));
     } else {
       setErrors(() => ({ ...errors, [id]: "" }));
     }

@@ -48,6 +48,37 @@ class MainApi {
       body: JSON.stringify(userData),
     }).then((res) => this._response(res));
   }
+
+  getSavedMovies() {
+    return fetch(`${this._baseUrl}/movies`, {
+      method: "GET",
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => this._response(res));
+  }
+
+  saveMovie(movieData) {
+    return fetch(`${this._baseUrl}/movies`, {
+      method: "POST",
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(movieData),
+    }).then((res) => this._response(res));
+  }
+
+  deleteMovie(movieId) {
+    return fetch(`${this._baseUrl}/movies/${movieId}`, {
+      method: "DELETE",
+      headers: {
+        ...this._headers,
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => this._response(res));
+  }
 }
 
 export const mainApiRequest = new MainApi({

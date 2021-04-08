@@ -1,13 +1,23 @@
-import React from "react";
+import React, { useContext } from "react";
+import { SavedMoviesContext } from "../../contexts/SavedMoviesContext";
 import Liked from "../Icons/Liked";
 import NotLiked from "../Icons/NotLiked";
 import DeleteIcon from "../Icons/DeleteIcon";
 import "./Movie.css";
 
-// TODO Добавить обработчики лайков/дислайков/удаления;
-// TODO Придумать реализацию isLiked после стыка с бэком Практикума;
+export default function Movie({
+  type,
+  item,
+  index,
+  onSaveMovie,
+  onDeleteMovie,
+}) {
+  const savedMoviesList = useContext(SavedMoviesContext);
 
-export default function Movie({ type, item, index }) {
+  const isMovieLiked = () => {
+    return savedMoviesList.some((movie) => movie.movieId === item.movieId);
+  };
+
   const formatDuration = (time) => {
     const hours = Math.floor(time / 60);
     const minutes = time - hours * 60;
@@ -25,9 +35,13 @@ export default function Movie({ type, item, index }) {
 
   const pickIcon = () => {
     if (type === "movies") {
-      return item.isLiked ? <Liked /> : <NotLiked />;
+      return isMovieLiked() ? (
+        <Liked onClick={() => onDeleteMovie(item.movieId)} />
+      ) : (
+        <NotLiked onClick={() => onSaveMovie(item)} />
+      );
     } else if (type === "saved-movies") {
-      return <DeleteIcon />;
+      return <DeleteIcon onClick={() => onDeleteMovie(item.movieId)} />;
     } else {
       return null;
     }
