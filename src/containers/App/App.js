@@ -60,7 +60,6 @@ function App() {
           .then(() => {
             setIsLoggedIn(() => true);
 
-            console.log("path", history.location.pathname);
             history.push("/");
           })
           .catch((err) => console.log(new Error(err)));
@@ -125,11 +124,14 @@ function App() {
       });
   };
 
+  //localStorage.removeItem("movies");
+
   const onLogOut = () => {
     window.localStorage.removeItem("token");
     setIsLoggedIn(false);
     setCurrentUser(() => ({}));
     resetMovies();
+    localStorage.removeItem("movies");
     history.push("/");
     openNotificationModal({
       type: "success",
@@ -139,30 +141,47 @@ function App() {
 
   const onSearchFormSubmit = (data, statusCallback) => {
     setShouldShowPreloader(() => true);
-    localStorage.removeItem("movies");
     resetMovies();
-    moviesApiRequest
-      .getMovies()
-      .then((res) => {
-        const preparedMoviesList = prepareMoviesList(res, data);
 
-        if (preparedMoviesList.length === 0) {
-          statusCallback(() => "Ничего не найдено");
-        } else {
-          setMovies(() => preparedMoviesList);
+    const localStaragedMovies = JSON.parse(localStorage.getItem("movies"));
+
+    if (localStaragedMovies) {
+      const filteredMoviesList = filterMoviesList(localStaragedMovies, data);
+
+      if (filteredMoviesList.length === 0) {
+        statusCallback(() => "Ничего не найдено");
+      } else {
+        setMovies(() => filteredMoviesList);
+      }
+
+      setTimeout(() => setShouldShowPreloader(() => false), 3000);
+    } else {
+      moviesApiRequest
+        .getMovies()
+        .then((res) => {
+          const preparedMoviesList = prepareMoviesList(res, data);
+
           localStorage.setItem("movies", JSON.stringify(preparedMoviesList));
-        }
-      })
-      .catch((err) => {
-        console.log(new Error(err));
-        statusCallback(
-          () =>
-            "Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз"
-        );
-      })
-      .finally(() => {
-        setTimeout(() => setShouldShowPreloader(() => false), 3000);
-      });
+
+          const filteredMoviesList = filterMoviesList(preparedMoviesList, data);
+
+          if (filteredMoviesList.length === 0) {
+            statusCallback(() => "Ничего не найдено");
+          } else {
+            setMovies(() => filteredMoviesList);
+          }
+        })
+        .catch((err) => {
+          console.log(new Error(err));
+          statusCallback(
+            () =>
+              "Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз"
+          );
+        })
+        .finally(() => {
+          setTimeout(() => setShouldShowPreloader(() => false), 3000);
+        });
+    }
   };
 
   const onSearchSavedMoviesSubmit = (data, statusCallback) => {

@@ -20,16 +20,28 @@ export const filterMoviesList = (moviesList, searchAttributes) => {
 
 const baseUrl = "https://api.nomoreparties.co";
 
-export const prepareMoviesList = (moviesList, searchAttributes) =>
-  filterMoviesList(moviesList, searchAttributes).map((item) => {
+const shouldUseBaseUrl = (field) => {
+  if (typeof field !== "string") {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const prepareMoviesList = (items) =>
+  items.map((item) => {
     return {
       country: item.country,
       director: item.director,
       duration: item.duration,
       year: item.year,
       description: item.description,
-      image: `${baseUrl}${item.image?.url}`,
-      thumbnail: `${baseUrl}${item.image?.formats?.thumbnail?.url}`,
+      image: shouldUseBaseUrl(item.image)
+        ? `${baseUrl}${item.image?.url}`
+        : item.image,
+      thumbnail: shouldUseBaseUrl(item.thumbnail)
+        ? `${baseUrl}${item.image?.formats?.thumbnail?.url}`
+        : item.thumbnail,
       trailer: item.trailerLink,
       movieId: item.id,
       nameEN: item.nameEN,

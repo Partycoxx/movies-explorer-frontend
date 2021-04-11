@@ -33,7 +33,7 @@ export default function Movies({
 
     return () => {
       window.removeEventListener("resize", resize);
-      cleanUp();
+      //cleanUp();
     };
   }, []);
 
