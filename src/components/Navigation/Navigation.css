@@ -3,13 +3,10 @@
   width: 100%;
   align-items: baseline;
   justify-content: space-between;
-}
-
-.navigation_promo {
   max-width: 183px;
 }
 
-.navigation_application {
+.navigation_logged {
   max-width: 381px;
 }
 

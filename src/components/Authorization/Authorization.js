@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { handleValidation } from "../../utils/helpers";
 import Button from "../Button/Button";
 import Input from "../Input/Input";
 
 import "./Authorization.css";
 
-export default function Authorization({ type }) {
+export default function Authorization({ type, handleSignIn, handleSignUp }) {
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -23,22 +24,26 @@ export default function Authorization({ type }) {
       text: "Ещё не зарегистрированы?",
       linkText: "Регистрация",
       link: "/signup",
+      onClick: (data) => handleSignIn(data),
     },
     register: {
       button: "Зарегистрироваться",
       text: "Уже зарегистрированы?",
       linkText: "Войти",
       link: "/signin",
+      onClick: (data) => handleSignUp(data),
     },
   };
+
   const renderButtons = () => {
     return (
       <>
         <Button
-          onClick={() => {}}
+          onClick={() => buttonTexts[type].onClick(inputValues)}
           text={buttonTexts[type].button}
           className="authorization__button"
           type="primary"
+          disabled={!isFormValid()}
         />
         <span className="authorization__text">{buttonTexts[type].text}</span>
         <Link
@@ -53,17 +58,32 @@ export default function Authorization({ type }) {
 
   const handleInputChange = (e) => {
     const {
-      target: { id, value, validationMessage },
+      target: { id, value },
     } = e;
 
     setInputValues(() => ({ ...inputValues, [id]: value }));
 
-    if (!e.target.validity.valid) {
-      setErrors(() => ({ ...errors, [id]: validationMessage }));
+    const validationResult = handleValidation(e);
+
+    if (!validationResult.valid) {
+      setErrors(() => ({ ...errors, [id]: validationResult.message }));
     } else {
       setErrors(() => ({ ...errors, [id]: "" }));
     }
   };
+
+  const hasErrors = () => Object.values(errors).some((item) => item.length > 0);
+  const hasData = () => {
+    if (type === "login") {
+      return Object.entries(inputValues)
+        .filter((item) => item[0] !== "name")
+        .every((item) => item[1].length > 0);
+    } else {
+      return Object.values(inputValues).every((item) => item.length > 0);
+    }
+  };
+
+  const isFormValid = () => !hasErrors() && hasData();
 
   return (
     <section className="authorization">
@@ -88,8 +108,6 @@ export default function Authorization({ type }) {
             label="E-mail"
             id="email"
             type="email"
-            minLength="2"
-            maxLength="30"
             required={true}
             handleChange={handleInputChange}
             value={inputValues.email}
@@ -99,7 +117,7 @@ export default function Authorization({ type }) {
             label="Пароль"
             id="password"
             type="password"
-            minLength="2"
+            minLength="8"
             maxLength="30"
             required={true}
             handleChange={handleInputChange}

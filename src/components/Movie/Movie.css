@@ -15,6 +15,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  max-width: 81%;
 }
 
 .movie__title {
@@ -22,9 +23,9 @@
   font-weight: 500;
   font-size: 15px;
   line-height: 18.15px;
-  max-width: 225px;
   text-overflow: ellipsis;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .movie__duration {
@@ -37,6 +38,8 @@
 .movie__image {
   object-fit: cover;
   max-height: 203px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 @media screen and (max-width: 768px) {

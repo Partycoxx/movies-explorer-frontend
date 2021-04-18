@@ -9,7 +9,7 @@ import classNames from "classnames";
 //TODO Добавить подсветку кнопок в зависимости от выбранного раздела
 //TODO Проверить переходы на существующую вкладку
 
-export default function Navigation({ type, isMobile }) {
+export default function Navigation({ type, isMobile, isLoggedIn }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isTabChecked, setIsTabChecked] = useState([
     {
@@ -120,7 +120,7 @@ export default function Navigation({ type, isMobile }) {
   );
 
   const pickContent = () => {
-    if (isMobile && type === "application") {
+    if (isMobile && isLoggedIn) {
       return (
         <>
           <Hamburger onClick={toggleMenu} className="navigation__hamburger" />
@@ -143,15 +143,17 @@ export default function Navigation({ type, isMobile }) {
           </div>
         </>
       );
-    } else if (type === "promo") {
+    } else if (!isLoggedIn) {
       return authButtons;
-    } else if (type === "application") {
+    } else {
       return appButtons;
     }
   };
 
   return (
-    <div className={classNames("navigation", `navigation_${type}`)}>
+    <div
+      className={classNames("navigation", { navigation_logged: isLoggedIn })}
+    >
       {pickContent()}
     </div>
   );

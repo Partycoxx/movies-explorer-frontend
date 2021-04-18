@@ -1,13 +1,26 @@
 import React from "react";
-import Button from "../Button/Button";
 import "./MoviesList.css";
 import Movie from "../Movie/Movie";
 
-export default function MoviesList({ type, movies }) {
+export default function MoviesList({
+  type,
+  movies,
+  handleSaveMovie,
+  handleDeleteMovie,
+  moviesListStatus = "",
+}) {
   const mapMovies = () => {
-    if (movies) {
+    if (movies.length > 0) {
       const mappedMovies = movies.map((item, index) => {
-        return <Movie type={type} item={item} key={index} />;
+        return (
+          <Movie
+            type={type}
+            item={item}
+            key={item.movieId}
+            onSaveMovie={handleSaveMovie}
+            onDeleteMovie={handleDeleteMovie}
+          />
+        );
       });
 
       return (
@@ -18,18 +31,11 @@ export default function MoviesList({ type, movies }) {
     } else {
       return (
         <div className="movies-list__container movies-list__container_empty">
-          Похоже, список фильмов пуст
+          {moviesListStatus}
         </div>
       );
     }
   };
 
-  return (
-    <div className="movies-list">
-      {mapMovies()}
-      {type === "movies" && (
-        <Button className="movies-list__button" text="Ещё" onClick={() => {}} />
-      )}
-    </div>
-  );
+  return <div className="movies-list">{mapMovies()}</div>;
 }
