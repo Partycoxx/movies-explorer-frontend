@@ -3,7 +3,7 @@ import Button from "../Button/Button";
 import Slider from "../Slider/Slider";
 import "./Search.css";
 
-export default function Search({ onFormSubmit }) {
+export default function Search({ onFormSubmit, setResultStatus }) {
   const [searchData, setSearchData] = useState({
     movie: "",
     hasShortFilms: false,
@@ -11,7 +11,7 @@ export default function Search({ onFormSubmit }) {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    onFormSubmit(searchData);
+    onFormSubmit(searchData, setResultStatus);
   };
 
   const handleSLiderChange = (e) => {

@@ -7,12 +7,12 @@ import Header from "../../components/Header/Header";
 import Promo from "../../components/Promo/Promo";
 import Techs from "../../components/Techs/Techs";
 
-export default function Main() {
+export default function Main({ isLoggedIn }) {
   const sectionRef = useRef(null);
 
   return (
     <>
-      <Header type="promo" hasNavigation={true} />
+      <Header type="promo" hasNavigation={true} isLoggedIn={isLoggedIn} />
       <ContentBlock bgColor="dark-grey">
         <Promo refLink={sectionRef} />
       </ContentBlock>

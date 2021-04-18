@@ -5,7 +5,11 @@ import "./Header.css";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 
-export default function Header({ type = "default", hasNavigation }) {
+export default function Header({
+  type = "default",
+  hasNavigation,
+  isLoggedIn,
+}) {
   const [isMobile, setIsMobile] = useState(false);
 
   const hasType = type !== "default" ? true : false;
@@ -31,7 +35,9 @@ export default function Header({ type = "default", hasNavigation }) {
       >
         <HeaderLogo />
       </Link>
-      {hasNavigation && <Navigation type={type} isMobile={isMobile} />}
+      {hasNavigation && (
+        <Navigation type={type} isMobile={isMobile} isLoggedIn={isLoggedIn} />
+      )}
     </header>
   );
 }

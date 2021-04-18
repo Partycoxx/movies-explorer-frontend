@@ -1,0 +1,26 @@
+.movies {
+  padding: 0 0 80px;
+}
+
+.movies__button {
+  width: 320px;
+  padding: 10px 0;
+  border: none;
+  background-color: #f4f4f4;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14.52px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+@media screen and (max-width: 450px) {
+  .movies {
+    padding: 0 0 90px;
+  }
+  .movies__button {
+    width: 240px;
+  }
+}

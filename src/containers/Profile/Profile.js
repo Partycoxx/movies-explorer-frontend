@@ -1,18 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
+import { CurrentUserContext } from "../../contexts/CurrentUserContext";
 import Button from "../../components/Button/Button";
 import Header from "../../components/Header/Header";
 
 import "./Profile.css";
 
 export default function Profile({
-  user,
   handleOpenModal,
   handleSignOut,
-  ...props
+  isLoggedIn,
 }) {
+  const user = useContext(CurrentUserContext);
   return (
     <>
-      <Header type="application" hasNavigation={true} />
+      <Header type="application" hasNavigation={true} isLoggedIn={isLoggedIn} />
       <section className="profile">
         <div className="profile__container">
           <h1 className="profile__title">Привет, {user.name}</h1>
